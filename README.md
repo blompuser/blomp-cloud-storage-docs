@@ -128,7 +128,7 @@ rclone --config ~/.config/rclone/blomp-demo.conf config`
 1. Leave tenant tenant ID blank
 
    ```log
-   tenant> storage
+   tenant_id> 
    ```
 
 1. leave blank all following options until you get to `auth_version`, type `2` and press enter
