@@ -353,7 +353,6 @@ At the time of writting this guide, `--swift-chunk-size` option is not working w
 - [ ] BlompLive 
   _Only BlompSupport could confirm that it works, until the time of creation of current document it never worked for me_)
 - [ ] BlompGo
-- [ ] BlompLive
 
 *Due to file size restriction, all other overlays will use chunker as their remote. That way we get around file size limit without any loss of time compared to uploads without chunker overlay.*
 
