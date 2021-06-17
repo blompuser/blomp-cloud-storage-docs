@@ -449,6 +449,8 @@ At the time of writting this guide, `--swift-chunk-size` option is not working w
    y/e/d> y
    ```
 
+   ⚠️ - Ensure to change chunk_size from 5.000G to `5242879K`, as otherwise chunker will fail. You can set any lower value like `1G`.
+
 ### Create crypt overlay for blomp chunker
 
 1. Create new crypt remote for blomp-chunker
