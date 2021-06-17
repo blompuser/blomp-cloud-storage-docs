@@ -3,6 +3,8 @@ Blomp Cloud Storage documentatioin
 
 ## Table of content
 
+![](https://dashboard.blomp.com/images/logo_light.png)
+
 <!-- TOC -->
 
 - [blomp-cloud-storage-docs](#blomp-cloud-storage-docs)
