@@ -14,6 +14,7 @@ Blomp Cloud Storage documentatioin
         - [Rclone Installation & documentation](#rclone-installation--documentation)
         - [Rclone Downloads](#rclone-downloads)
     - [Create rclone config for Blomp cloud storage first time install](#create-rclone-config-for-blomp-cloud-storage-first-time-install)
+        - [Table of demo remotes](#table-of-demo-remotes)
         - [Start rclone config](#start-rclone-config)
         - [Create remote config for Blomp](#create-remote-config-for-blomp)
             - [Optional - advanced config](#optional---advanced-config)
@@ -76,7 +77,12 @@ Please see the [rclone website](https://rclone.org/) for:
 
 ## Create rclone config for Blomp cloud storage (first time install)
 
-Overview table of remotes which we will create
+As example we will use several rclone modules combined to offer some general use example. For more info about [swift](https://rclone.org/swift/), [chunker](https://rclone.org/chunker/), [crypt](https://rclone.org/crypt/) and [compress](https://rclone.org/compress/) modules as well as description of [mount command](https://rclone.org/commands/rclone_mount/) can be found at official rclone documentation.
+
+
+### Table of demo remotes
+
+Here is a table of demo configuration remotes and alias.
 
 name | storage type | chunk size*¹ | encrypted | compressed | max. file size
 :- | -:  | :-: | :-: | :-: | -:
@@ -91,6 +97,14 @@ name | storage type | chunk size*¹ | encrypted | compressed | max. file size
 - _*¹ - setting swift to 1P technically disables chunker and only files equal/smaller than max. file size can uploaded._
 
 - _*² - as long as there is free space and chunk naming allows enough chunks_
+
+#### Table description
+
+- blomp-remote is main blomp storage
+- blomp chunker is chunker overlay which chunks data. This can be used for different purposes, one of them would be for abililty to get error Blomp's max file size restriction or for users who care about privacy and security and want their files to be chunked into some specific size to hide actual file size. In current demo, we will use max. allowed file size as chunk_size, all files smaller than 5G will not be chunked, only files bigger than 5G
+- blomp-chunker-archive is compress overlay with max gzip compression using chunker. This is especially usefull for archive purpose as well for storage of disk images which do normally contain free space, compressing such images on the fly.
+- blomp-trezor is overlay using chunker for ability to upload files bigger than 5G which do require manual chunking or for security purpose to hide real file size.
+- blomp-trezor-archive is copmress overlay for encrypted and chunked data. Similar to blomp-chunker-archive, this is very usefull for image backups which contain some sensible data and one would like to have it stored encrypted
 
 ### Start rclone config
 
