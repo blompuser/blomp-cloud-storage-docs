@@ -9,6 +9,10 @@ Blomp Cloud Storage documentatioin
 
 - [blomp-cloud-storage-docs](#blomp-cloud-storage-docs)
     - [Table of content](#table-of-content)
+    - [Rclone - Installation and documentation](#rclone---installation-and-documentation)
+        - [Rclone Features](#rclone-features)
+        - [Rclone Installation & documentation](#rclone-installation--documentation)
+        - [Rclone Downloads](#rclone-downloads)
     - [Create rclone config for Blomp cloud storage first time install](#create-rclone-config-for-blomp-cloud-storage-first-time-install)
         - [Start rclone config](#start-rclone-config)
         - [Create remote config for Blomp](#create-remote-config-for-blomp)
@@ -27,6 +31,48 @@ Blomp Cloud Storage documentatioin
     - [Demo config - rclone.conf](#demo-config---rcloneconf)
 
 <!-- /TOC -->
+
+## Rclone - Installation and documentation
+
+Repository contains outdated rclone version which lacks on several features where one of them is selfupdate function. You can install from repository.
+
+I suggest to either [download latest binaries](https://github.com/rclone/rclone/releases) or compile and install from source. On later points you will upgrade binary directly with `rclone selfupdate` as well for beta `rclone selfupdate --beta` for those who want to test latest version.
+
+For installation guides and more info visit [official rclone description](https://github.com/rclone/rclone) which is always kept up to date.
+
+Please see [the full list of all storage providers and their features](https://rclone.org/overview/)
+
+### Rclone Features
+
+  * MD5/SHA-1 hashes checked at all times for file integrity
+  * Timestamps preserved on files
+  * Partial syncs supported on a whole file basis
+  * [Copy](https://rclone.org/commands/rclone_copy/) mode to just copy new/changed files
+  * [Sync](https://rclone.org/commands/rclone_sync/) (one way) mode to make a directory identical
+  * [Check](https://rclone.org/commands/rclone_check/) mode to check for file hash equality
+  * Can sync to and from network, e.g. two different cloud accounts
+  * Optional large file chunking ([Chunker](https://rclone.org/chunker/))
+  * Optional transparent compression ([Compress](https://rclone.org/compress/))
+  * Optional encryption ([Crypt](https://rclone.org/crypt/))
+  * Optional FUSE mount ([rclone mount](https://rclone.org/commands/rclone_mount/))
+  * Multi-threaded downloads to local disk
+  * Can [serve](https://rclone.org/commands/rclone_serve/) local or remote files over HTTP/WebDav/FTP/SFTP/dlna
+
+### Rclone Installation & documentation
+
+Please see the [rclone website](https://rclone.org/) for:
+
+  * [Installation](https://rclone.org/install/)
+  * [Documentation & configuration](https://rclone.org/docs/)
+  * [Changelog](https://rclone.org/changelog/)
+  * [FAQ](https://rclone.org/faq/)
+  * [Storage providers](https://rclone.org/overview/)
+  * [Forum](https://forum.rclone.org/)
+  * ...and more
+
+### Rclone Downloads
+
+  * https://rclone.org/downloads/
 
 ## Create rclone config for Blomp cloud storage (first time install)
 
