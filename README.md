@@ -15,6 +15,7 @@ Blomp Cloud Storage documentatioin
         - [Rclone Downloads](#rclone-downloads)
     - [Create rclone config for Blomp cloud storage first time install](#create-rclone-config-for-blomp-cloud-storage-first-time-install)
         - [Table of demo remotes](#table-of-demo-remotes)
+            - [Table description](#table-description)
         - [Start rclone config](#start-rclone-config)
         - [Create remote config for Blomp](#create-remote-config-for-blomp)
             - [Optional - advanced config](#optional---advanced-config)
@@ -30,6 +31,9 @@ Blomp Cloud Storage documentatioin
             - [Optional advanced settings](#optional-advanced-settings)
         - [Finished, remote overview and quit rclone config](#finished-remote-overview-and-quit-rclone-config)
     - [Demo config - rclone.conf](#demo-config---rcloneconf)
+    - [Demo Systemd service files](#demo-systemd-service-files)
+        - [How to enable service](#how-to-enable-service)
+        - [How to start/stop/restart service](#how-to-startstoprestart-service)
 
 <!-- /TOC -->
 
@@ -807,7 +811,7 @@ At the time of writting this guide, `--swift-chunk-size` option is not working w
    e/n/d/r/c/s/q> q
    ```
 
-## Demo config - rclone.conf
+## Demo config - [rclone.conf](.config/rclone/blomp-demo.conf)
 
 ```conf
 [blomp-remote]
@@ -862,3 +866,44 @@ level = 9
 ram_cache_limit = 20M
 ```
 
+## Demo Systemd service files
+
+Example how some basic service file mounting drive on system launch could look like. Here are [5 service files](etc/systemd/system) which could be enabled, you can test those by simply replacing credentials in rclone.conf.
+
+- [blomp](etc/systemd/system/blomp.service)
+  - [blomp-chunker](etc/systemd/system/blomp-chunker.service)
+    - [blomp-chunker-archive](etc/systemd/system/blomp-chunker-archive.service)
+  - [blomp-trezor](etc/systemd/system/blomp-trezor.service)
+    - [blomp-trezor-archive](etc/systemd/system/blomp-trezor-archive.service)
+
+### How to enable service
+
+Enable service, example with blomp-trezor-archive:
+
+```shell
+sudo systemctl enable blomp-trezor-archive
+```
+
+Disable service, example with blomp-trezor-archive:
+
+```shell
+sudo systemctl enable blomp-trezor-archive
+```
+
+### How to start/stop/restart service
+
+You can use start to start, stop to stop and restart to restart running service.
+
+All examples with blomp-trezor-archive:
+
+```shell
+sudo systemctl start blomp-trezor-archive
+```
+
+```shell
+sudo systemctl stop blomp-trezor-archive
+```
+
+```shell
+sudo systemctl restart blomp-trezor-archive
+```
