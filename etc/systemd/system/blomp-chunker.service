@@ -25,7 +25,8 @@ ExecStart=/usr/bin/rclone  mount blomp-chunker: /media/blomp-chunker \
 	--gid 1000 \
 	--umask 0755 \
 	--log-level DEBUG \
-	--log-systemd
+	--log-systemd \
+	--fast-list
 ExecStop=/bin/fusermount -uz /media/blomp-chunker
 ExecStopPost=+/bin/rm -r /media/blomp-chunker
 Restart=on-abort

@@ -25,7 +25,8 @@ ExecStart=/usr/bin/rclone  mount blomp-trezor: /media/blomp-trezor \
 	--gid 1000 \
 	--umask 0755 \
 	--log-level DEBUG \
-	--log-systemd
+	--log-systemd \
+	--fast-list
 ExecStop=/bin/fusermount -uz /media/blomp-trezor
 ExecStopPost=+/bin/rm -r /media/blomp-trezor
 Restart=on-abort

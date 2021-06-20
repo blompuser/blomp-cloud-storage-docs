@@ -25,7 +25,8 @@ ExecStart=/usr/bin/rclone  mount blomp-alias: /media/blomp \
 	--gid 1000 \
 	--umask 0755 \
 	--log-level DEBUG \
-	--log-systemd
+	--log-systemd \
+	--fast-list
 ExecStop=/bin/fusermount -uz /media/blomp
 ExecStopPost=+/bin/rm -r /media/blomp
 Restart=on-abort
