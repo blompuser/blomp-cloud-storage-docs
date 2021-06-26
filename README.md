@@ -40,6 +40,10 @@ Blomp Cloud Storage documentatioin
     - [non local overlays (not recommended)](#non-local-overlays-not-recommended)
     - [How to enable service](#how-to-enable-service)
     - [How to start/stop/restart service](#how-to-startstoprestart-service)
+    - [Blomp limitations](#blomp-limitations)
+      - [Max file size: using Dashboard upload](#max-file-size-using-dashboard-upload)
+      - [Max file size: BlompLive](#max-file-size-blomplive)
+      - [Max file size: BlompGo](#max-file-size-blompgo)
 
 <!-- /TOC -->
 
@@ -1094,3 +1098,22 @@ sudo systemctl stop blomp-trezor-archive
 ```shell
 sudo systemctl restart blomp-trezor-archive
 ```
+
+### Blomp limitations
+
+There are several limits and restrictions on Blomp for now. It is not know to me if there are plans to either update product description or to raise limits to claimed unlimited, however, here are few restrictions
+
+#### Max file size: using Dashboard upload
+
+By uploading files via browser you are restricted in many points compared to mounting it as a drive. One of those is max file size which is: 100GB, **you can not upload files bigger than 100GB**.
+
+#### Max file size: BlompLive
+
+BlompGo is a blomp's application for PC which is very restricted in features compared to rclone, max file size seems to be under 5G, exactly 5242879K. **Files bigger/equal 5242879K can not be uploaded**
+
+#### Max file size: BlompGo
+
+Blomp Live is blomp's application mounting disk as Z: drive. Here we currently also have restriction of max file size 5242879K. BlompSupport could show logs where --swift-chunk-size works and files are indeed properly segmented into *_segments* container. However, nobody except BlompSupport could confirm by log that it works, we all get **permission denied error** which indicates that it is planned that chunker works. For now it does not for any user and by that max. file size restriction is same as with BlompLive, which is exactly 5242879K. **Currently, files bigger than 5242879K can not be uploaded via BlompGo (your Z: drive)**
+
+Swift has in general restriction with max file size of 5G. [Here](https://rclone.org/swift/#limitations) is some explanation of limits connected to that.
+> The Swift API doesn't return a correct MD5SUM for segmented files (Dynamic or Static Large Objects) so rclone won't check or use the MD5SUM for these.
