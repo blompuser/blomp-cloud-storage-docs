@@ -34,3 +34,54 @@ RestartSec=2
 
 [Install]
 WantedBy=multi-user.target
+
+
+
+
+[Unit]
+Description="Blomp Main storage - chunks only files over 5G to 5G chunks, remote overlay"
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=yourusername
+Group=1000
+TimeoutStartSec=6000
+
+Type=notify
+ExecStartPre=+/bin/mkdir -p /media/yourusername/blomp-chunker-archive
+ExecStartPre=+/bin/chown -hR yourusername:1000 /media/yourusername/blomp-chunker-archive
+ExecStart=/usr/bin/rclone mount blomp-chunker-archive: /media/yourusername/blomp-chunker-archive \
+        --config /media/yourusername/.config/rclone/rclone.conf \
+        --no-modtime \
+        --no-checksum \
+        --no-seek \
+        --allow-non-empty \
+        --vfs-cache-mode full \
+        --vfs-cache-max-age 10m \
+        --bwlimit-file 16M \
+        --poll-interval 30s \
+        --dir-cache-time 60m \
+        --transfers 8 \
+        --checkers 8 \
+        --file-perms 0666 \
+        --dir-perms 0777 \
+        --uid 1000 \
+        --gid 1000 \
+        --umask 0755 \
+        --log-level DEBUG \
+        --cache-dir /media/yourusername/.cache/rclone \
+        --log-systemd \
+        --write-back-cache \
+		--use-mmap \
+		--stats 1m \
+        --timeout 1m \
+        --contimeout 10s \
+        --fast-list
+ExecStop=/bin/fusermount -uz /media/yourusername/blomp-chunker-archive
+ExecStopPost=+/bin/rm -r /media/yourusername/blomp-chunker-archive
+Restart=on-abort
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
