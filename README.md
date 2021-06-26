@@ -8,32 +8,36 @@ Blomp Cloud Storage documentatioin
 <!-- TOC -->
 
 - [blomp-cloud-storage-docs](#blomp-cloud-storage-docs)
-    - [Table of content](#table-of-content)
-    - [Rclone - Installation and documentation](#rclone---installation-and-documentation)
-        - [Rclone Features](#rclone-features)
-        - [Rclone Installation & documentation](#rclone-installation--documentation)
-        - [Rclone Downloads](#rclone-downloads)
-    - [Create rclone config for Blomp cloud storage first time install](#create-rclone-config-for-blomp-cloud-storage-first-time-install)
-        - [Table of demo remotes](#table-of-demo-remotes)
-            - [Table description](#table-description)
-        - [Start rclone config](#start-rclone-config)
-        - [Create remote config for Blomp](#create-remote-config-for-blomp)
-            - [Optional - advanced config](#optional---advanced-config)
-    - [Advanced Configuration for Blomp with rclone](#advanced-configuration-for-blomp-with-rclone)
-        - [Create alias for remote for blomp-remote](#create-alias-for-remote-for-blomp-remote)
-        - [Create chunker overlay for blomp](#create-chunker-overlay-for-blomp)
-            - [Optional, advanced chunker settings](#optional-advanced-chunker-settings)
-        - [Create crypt overlay for blomp chunker](#create-crypt-overlay-for-blomp-chunker)
-            - [Optional advanced settings](#optional-advanced-settings)
-        - [Create compress overlay for blomp crypt overlay](#create-compress-overlay-for-blomp-crypt-overlay)
-            - [Optional advanced settings](#optional-advanced-settings)
-        - [Create compress overlay for blomp chunker overlay](#create-compress-overlay-for-blomp-chunker-overlay)
-            - [Optional advanced settings](#optional-advanced-settings)
-        - [Finished, remote overview and quit rclone config](#finished-remote-overview-and-quit-rclone-config)
-    - [Demo config - rclone.conf](#demo-config---rcloneconf)
-    - [Demo Systemd service files](#demo-systemd-service-files)
-        - [How to enable service](#how-to-enable-service)
-        - [How to start/stop/restart service](#how-to-startstoprestart-service)
+  - [Table of content](#table-of-content)
+  - [Rclone - Installation and documentation](#rclone---installation-and-documentation)
+    - [Rclone Features](#rclone-features)
+    - [Rclone Installation & documentation](#rclone-installation--documentation)
+    - [Rclone Downloads](#rclone-downloads)
+  - [Create rclone config for Blomp cloud storage (first time install)](#create-rclone-config-for-blomp-cloud-storage-first-time-install)
+    - [Table of demo remotes](#table-of-demo-remotes)
+      - [Table description](#table-description)
+    - [Start rclone config](#start-rclone-config)
+    - [Create remote config for Blomp](#create-remote-config-for-blomp)
+      - [Optional - advanced config](#optional---advanced-config)
+  - [Local overlays - chunker, compress and crypt](#local-overlays---chunker-compress-and-crypt)
+    - [overlays over local overlays](#overlays-over-local-overlays)
+  - [Advanced Configuration for Blomp with rclone](#advanced-configuration-for-blomp-with-rclone)
+    - [Create alias for remote for blomp-remote](#create-alias-for-remote-for-blomp-remote)
+    - [Create chunker overlay for blomp](#create-chunker-overlay-for-blomp)
+      - [Optional, advanced chunker settings](#optional-advanced-chunker-settings)
+    - [Create crypt overlay for blomp chunker](#create-crypt-overlay-for-blomp-chunker)
+      - [Optional advanced settings](#optional-advanced-settings)
+    - [Create compress overlay for blomp crypt overlay](#create-compress-overlay-for-blomp-crypt-overlay)
+      - [Optional advanced settings](#optional-advanced-settings-1)
+    - [Create compress overlay for blomp chunker overlay](#create-compress-overlay-for-blomp-chunker-overlay)
+      - [Optional advanced settings](#optional-advanced-settings-2)
+    - [Finished, remote overview and quit rclone config](#finished-remote-overview-and-quit-rclone-config)
+  - [Demo config - rclone.conf](#demo-config---rcloneconf)
+  - [Demo Systemd service files](#demo-systemd-service-files)
+    - [local overlays (recommended)](#local-overlays-recommended)
+    - [non local overlays (not recommended)](#non-local-overlays-not-recommended)
+    - [How to enable service](#how-to-enable-service)
+    - [How to start/stop/restart service](#how-to-startstoprestart-service)
 
 <!-- /TOC -->
 
@@ -332,6 +336,119 @@ files are easier to deal with and have an MD5SUM.*
    ```log
    e/n/d/r/c/s/q> 
    ```
+
+## Local overlays - chunker, compress and crypt
+
+With blomp you can use overlays directly, but it is not recommended.
+
+Use instead [local](https://rclone.org/local/) overlays of [chunker](https://rclone.org/chunker/), [compress](https://rclone.org/compress/) and [crypt](https://rclone.org/crypt/).
+
+[Example config for local filesystem, chunker, compress and crypt](.config/rclone/blomp-local-demo.conf):
+
+```conf
+# configure local filesystem, in current case we want to use one_file_system, for more info read https://rclone.org/local/#restricting-filesystems-with-one-file-system
+[local]
+type = local
+nounc = true
+one_file_system = true
+case_sensitive = true
+no_preallocate = true
+no_set_modtime = true
+
+# alias for Blomp online storage for easier access
+[blomp-alias]
+type = alias
+remote = blomp-remote:demo@mail.com
+
+# local filesystem alias for easier/simpler access.
+# remote in current case is the folder
+# ensure that your user is the owner of that folder and has write access
+[blomp-local]
+type = alias
+remote = local:/media/yourusername/blomp-local
+
+# local chunker for Blomp, chunking only files above chunk_size
+# norename is used to speed up the process
+# max number of chunks is 99999, to change it, edit amount of # in name_format
+[blomp-local-chunker]
+type = chunker
+remote = blomp-local:
+chunk_size = 5242879K
+name_format = *.#####
+start_from = 1
+hash_type = md5
+meta_format = simplejson
+fail_hard = false
+transactions = norename
+
+# local compression to gzip with highest compression, level 9 is highest compression
+[blomp-local-gzip]
+type = compress
+remote = blomp-local:
+level = 9
+
+# local encrypt/decrypt module. 
+# Crypt module should be created with rclone config where your password will be save encrypted to rclone.conf
+[blomp-local-trezor]
+type = crypt
+remote = blomp-local:trezor
+filename_encryption = standard
+directory_name_encryption = true
+password = ***ENCRYPTED-PASS***
+password2 = ***ENCRYPTED-PASS***
+no_data_encryption = false
+```
+
+### overlays over local overlays
+
+Here are few examples of how different local overlays can be combined.
+
+```conf
+[blomp-local-gzip-chunked]
+type = compress
+remote = blomp-local-chunker:
+level = 9
+
+[blomp-local-chunked-gzip]
+type = chunker
+remote = blomp-local-gzip:
+chunk_size = 5242879K
+name_format = *.#####
+start_from = 1
+hash_type = md5
+meta_format = simplejson
+fail_hard = false
+transactions = norename
+
+[blomp-local-trezor-chunked]
+type = crypt
+remote = blomp-local-chunker:trezor
+filename_encryption = standard
+directory_name_encryption = true
+password = ***ENCRYPTED-PASS***
+password2 = ***ENCRYPTED-PASS***
+no_data_encryption = false
+
+[blomp-local-trezor-gzip-chunked]
+type = crypt
+remote = blomp-local-gzip-chunked:trezor
+filename_encryption = standard
+directory_name_encryption = true
+password = ***ENCRYPTED-PASS***
+password2 = ***ENCRYPTED-PASS***
+no_data_encryption = false
+
+# do not use
+[blomp-local-trezor-chunked-gzip]
+type = crypt
+remote = blomp-local-chunked-gzip:trezor
+filename_encryption = standard
+directory_name_encryption = true
+password = ***ENCRYPTED-PASS***
+password2 = ***ENCRYPTED-PASS***
+no_data_encryption = false
+
+```
 
 ## Advanced Configuration for Blomp with rclone
 
@@ -869,6 +986,18 @@ ram_cache_limit = 20M
 ## Demo Systemd service files
 
 Example how some basic service file mounting drive on system launch could look like. Here are [5 service files](etc/systemd/system) which could be enabled, you can test those by simply replacing credentials in rclone.conf.
+
+### local overlays (recommended)
+
+I recommend to use local overlays for whatever should be done in regard of chunking, compression and encryption/decryption.
+One of main reasons is that local overlays are much faster, due to very long wait times for copy/move, you would end up wasting a lot bandwidth and time, exceeding in few times the real amount of data which you need to upload.
+
+- In configs I used max. allowed file size for blomp which is currently 5Gbyte-1Kbyte.
+  - **Info for union remote**:
+    - the smaller the chunk size, the better it is in regard of using max available free space.
+    - the bigger the chunk size, the better it is in regard of performance but may leave few accounts with <chunk_size amount of free space.
+
+### non local overlays (not recommended)
 
 - [blomp](etc/systemd/system/blomp.service)
   - [blomp-chunker](etc/systemd/system/blomp-chunker.service)
