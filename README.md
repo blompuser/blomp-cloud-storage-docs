@@ -40,7 +40,7 @@ Blomp Cloud Storage documentatioin
     - [non local overlays (not recommended)](#non-local-overlays-not-recommended)
     - [How to enable service](#how-to-enable-service)
     - [How to start/stop/restart service](#how-to-startstoprestart-service)
-    - [Blomp limitations](#blomp-limitations)
+  - [Blomp limitations](#blomp-limitations)
       - [Max file size: using Dashboard upload](#max-file-size-using-dashboard-upload)
       - [Max file size: BlompLive](#max-file-size-blomplive)
       - [Max file size: BlompGo](#max-file-size-blompgo)
@@ -1099,7 +1099,7 @@ sudo systemctl stop blomp-trezor-archive
 sudo systemctl restart blomp-trezor-archive
 ```
 
-### Blomp limitations
+## Blomp limitations
 
 There are several limits and restrictions on Blomp for now. It is not know to me if there are plans to either update product description or to raise limits to claimed unlimited, however, here are few restrictions
 
