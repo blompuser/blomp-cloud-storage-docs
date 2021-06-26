@@ -32,8 +32,10 @@ Blomp Cloud Storage documentatioin
     - [Create compress overlay for blomp chunker overlay](#create-compress-overlay-for-blomp-chunker-overlay)
       - [Optional advanced settings](#optional-advanced-settings-2)
     - [Finished, remote overview and quit rclone config](#finished-remote-overview-and-quit-rclone-config)
-  - [Demo config - rclone.conf](#demo-config---rcloneconf)
+  - [Demo config (local filesystem) - rclone.conf (recommended)](#demo-config-local-filesystem---rcloneconf-recommended)
+  - [Demo config (using remote only) - rclone.conf (not recommended for use)](#demo-config-using-remote-only---rcloneconf-not-recommended-for-use)
   - [Demo Systemd service files](#demo-systemd-service-files)
+    - [Why do I recommend to use local filesystem for compress, chunking and crypt](#why-do-i-recommend-to-use-local-filesystem-for-compress-chunking-and-crypt)
     - [local overlays (recommended)](#local-overlays-recommended)
     - [non local overlays (not recommended)](#non-local-overlays-not-recommended)
     - [How to enable service](#how-to-enable-service)
@@ -814,22 +816,6 @@ At the time of writting this guide, `--swift-chunk-size` option is not working w
 
 ### Create compress overlay for blomp chunker overlay
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 1. Create new crypt overlay over blomp-chunker
 
    ```log
@@ -862,7 +848,7 @@ At the time of writting this guide, `--swift-chunk-size` option is not working w
 
    #### Optional advanced settings
 
-1. Set compression level
+2. Set compression level
 
    ```log
    level> 9
@@ -874,13 +860,13 @@ At the time of writting this guide, `--swift-chunk-size` option is not working w
    - Level -2 uses Huffmann encoding only. Only use if you now what you are doing
    - Level 0 turns off compression.
 
-1. Some remotes don't allow the upload of files with unknown size.
+3. Some remotes don't allow the upload of files with unknown size.
 
    ```log
    ram_cache_limit> 20M
    ```
 
-1. Confirm compress overlay settings
+4. Confirm compress overlay settings
 
    ```log
    Remote config
@@ -928,7 +914,67 @@ At the time of writting this guide, `--swift-chunk-size` option is not working w
    e/n/d/r/c/s/q> q
    ```
 
-## Demo config - [rclone.conf](.config/rclone/blomp-demo.conf)
+## Demo config (local filesystem) - [rclone.conf](.config/rclone/blomp-local-demo.conf) (recommended)
+
+This configuration is recommended. Chunker should not be required at all, but as swift-chunk-size on blomp does not work for anybody except blomp team, we are forced to use it as workaround.
+
+ℹ️ - *I have to mention that in my local example for chunker I use max allowed file size of 5GB - 1KB. If you want to combine your blomp with several other cloud storages in one drive, then choose for chunker the size of storage which offers smallest size, take as example dropbox, onedrive and other which have its own restrictions on max file size. You can set it to small sizes like 3M or 5M if you want*.
+
+```conf
+# configure local filesystem, in current case we want to use one_file_system, for more info read https://rclone.org/local/#restricting-filesystems-with-one-file-system
+[local]
+type = local
+nounc = true
+one_file_system = true
+case_sensitive = true
+no_preallocate = true
+no_set_modtime = true
+
+# alias for Blomp online storage for easier access
+[blomp-alias]
+type = alias
+remote = blomp-remote:demo@mail.com
+
+# local filesystem alias for easier/simpler access.
+# remote in current case is the folder
+# ensure that your user is the owner of that folder and has write access
+[blomp-local]
+type = alias
+remote = local:/media/yourusername/blomp-local
+
+# local chunker for Blomp, chunking only files above chunk_size
+# norename is used to speed up the process
+# max number of chunks is 99999, to change it, edit amount of # in name_format
+[blomp-local-chunker]
+type = chunker
+remote = blomp-local:
+chunk_size = 5242879K
+name_format = *.#####
+start_from = 1
+hash_type = md5
+meta_format = simplejson
+fail_hard = false
+transactions = norename
+
+# local compression to gzip with highest compression, level 9 is highest compression
+[blomp-local-gzip]
+type = compress
+remote = blomp-local:
+level = 9
+
+# local encrypt/decrypt module. 
+# Crypt module should be created with rclone config where your password will be save encrypted to rclone.conf
+[blomp-local-trezor]
+type = crypt
+remote = blomp-local:trezor
+filename_encryption = standard
+directory_name_encryption = true
+password = ***ENCRYPTED-PASS***
+password2 = ***ENCRYPTED-PASS***
+no_data_encryption = false
+```
+
+## Demo config (using remote only) - [rclone.conf](.config/rclone/blomp-demo.conf) (not recommended for use)
 
 ```conf
 [blomp-remote]
@@ -987,6 +1033,15 @@ ram_cache_limit = 20M
 
 Example how some basic service file mounting drive on system launch could look like. Here are [5 service files](etc/systemd/system) which could be enabled, you can test those by simply replacing credentials in rclone.conf.
 
+### Why do I recommend to use local filesystem for compress, chunking and crypt
+
+- it is much faster because operations and processes on remote
+  - in my examples I use norename for chunker simply because I tested one huge file and I wanted to spare uploading unrenamed chunks before huge file is uploaded, for smaller files than 20 gb you can and probably should use rename in chunker config.
+- requires much less:s
+  - time
+  - bandwidth
+
+*Using overlays directly on remote was only for testing purpose if it works and it does work, but it should not be used as users will have pretty bad experience compared to local filesystem.*
 ### local overlays (recommended)
 
 I recommend to use local overlays for whatever should be done in regard of chunking, compression and encryption/decryption.
@@ -997,6 +1052,9 @@ One of main reasons is that local overlays are much faster, due to very long wai
     - the smaller the chunk size, the better it is in regard of using max available free space.
     - the bigger the chunk size, the better it is in regard of performance but may leave few accounts with <chunk_size amount of free space.
 
+- [blomp](etc/systemd/system/blomp-local-chunker.service)  (*local remote chunked, shows chunked files*)
+- [blomp-local-compress](etc/systemd/system/blomp-local-compress.service)  (*local remote compress, shows compressed files as one*)
+- [blomp-trezor](etc/systemd/system/blomp-local-trezor.service)  (*local remote crypt, shows decrypted files and folders*)
 ### non local overlays (not recommended)
 
 - [blomp](etc/systemd/system/blomp.service)
