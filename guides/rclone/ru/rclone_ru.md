@@ -2,7 +2,7 @@
 
 ## Как установить и настроить rclone для Blomp.com
 
-Есть [несколько способов как вы мошете установить rclone.org](https://rclone.org/downloads/)
+Есть [несколько способов как вы можете установить rclone.org](https://rclone.org/downloads/)
 
 - [Скачайте](https://rclone.org/downloads/) и установите по инструкции.
 
