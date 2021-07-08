@@ -112,6 +112,13 @@ rclone | **unlimited***³ | **no***²
 
 ### Known issues uploading large files to Blomp.com
 
+- Error 403 Forbidden
+  ```log
+  INFO:swiftclient:RESP STATUS: 403 Forbidden
+  INFO:swiftclient:RESP HEADERS: {'Content-Length': '73', 'Content-Type': 'text/html; charset=UTF-8', 'X-Trans-Id': 'tx4135fea0dc864390a48a3-0060e7069a', 'X-Openstack-Request-Id': 'tx4135fea0dc864390a48a3-0060e7069a', 'Date': 'Thu, 08 Jul 2021 14:07:23 GMT'}
+  INFO:swiftclient:RESP BODY: b'<html><h1>Forbidden</h1><p>Access was denied to this resource.</p></html>'
+  ERROR:swiftclient.service:Container PUT failed: http://swiftproxy-01.acs.ai.net:8080/v1/AUTH_8b989f118e624ca6957e102775583f6f/your%40email.com 403 Forbidden  [first 60 chars of response] b'<html><h1>Forbidden</h1><p>Access was denied to this resourc'
+  ```
 - it seems there is no support available at all
   - all information here required a user to find it all out instead of providing working configurations
 - unannounced offline/maintenance
